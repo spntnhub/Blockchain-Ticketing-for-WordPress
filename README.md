@@ -65,8 +65,8 @@ Support: info@spntn.com
 | Content | Event description |
 | Event Date | Date and time |
 | Location | Venue / city |
-| Ticket Price | In wei (POL) or token units (USDC) |
-| Currency | POL or ERC-20 |
+| Ticket Price | Human-readable — e.g. `5` for 5 POL, `10` for 10 USDC |
+| Currency | POL (native) or ERC-20 (USDC auto-filled) |
 | Total Supply | 0 = unlimited |
 | Organizer Wallet | Receives 97% of sales |
 
@@ -101,8 +101,10 @@ Add to a page accessible by event staff (mobile browser):
 | Accepted payment | Native POL, USDC (ERC-20) |
 | Signature scheme (native) | `keccak256(organizer, eventId, tokenURI, price)` |
 | Signature scheme (ERC-20) | `keccak256(organizer, eventId, tokenURI, price, token)` |
+| Deployed (Polygon) | `0x20C8c6e569c00A5C0E660165f4d513D61424541E` |
 
-Deploy your own or use the shared instance — set the address in plugin settings.
+The shared contract on Polygon is used by default — no setup needed.
+You can deploy your own with:
 
 ```bash
 cd contracts

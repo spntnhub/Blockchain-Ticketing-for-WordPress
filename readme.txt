@@ -16,7 +16,7 @@ Sell and verify NFT event tickets on Polygon. Each ticket is a unique ERC-721 NF
 
 **How it works:**
 
-1. Create an event in WP Admin → set date, location, price, supply.
+1. Create an event in WP Admin → set date, location, price (e.g. `5` for 5 POL), supply.
 2. Publish the event → automatically synced to the backend.
 3. Add `[blockchain_event id="POST_ID"]` to any page.
 4. Buyers connect MetaMask and purchase. Each ticket is minted as a unique ERC-721 NFT on Polygon.
