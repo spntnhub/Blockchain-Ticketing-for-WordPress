@@ -163,9 +163,12 @@ class BT_Events {
         ];
 
         foreach ( $fields as $key => $sanitizer ) {
-            $input_key = ltrim( $key, '_' );
-            $input_key = ltrim( $input_key, 'bt_' );
-            $post_key  = 'bt_' . ltrim( $key, '_bt_' );
+            // Strip only the leading underscore to produce the form field name.
+            // e.g. '_bt_total_supply' → 'bt_total_supply'
+            // NOTE: ltrim($key, '_bt_') must NOT be used here — it treats the
+            //       second arg as a character mask, not a prefix, and strips the
+            //       't' from 'total', yielding 'bt_otal_supply'.
+            $post_key = ltrim( $key, '_' );
             if ( isset( $_POST[ $post_key ] ) ) {
                 update_post_meta( $post_id, $key, call_user_func( $sanitizer, wp_unslash( $_POST[ $post_key ] ) ) );
             }
