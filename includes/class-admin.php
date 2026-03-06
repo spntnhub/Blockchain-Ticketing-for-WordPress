@@ -98,15 +98,6 @@ class BT_Admin {
                         </td>
                     </tr>
                     <tr>
-                        <th scope="row"><label for="bt_contract"><?php esc_html_e( 'TicketNFT Contract Address', 'blockchain-ticketing' ); ?></label></th>
-                        <td>
-                            <input type="text" id="bt_contract" name="<?php echo esc_attr( BT_OPTION_KEY ); ?>[contract_address]"
-                                   value="<?php echo esc_attr( $opts['contract_address'] ?? '' ); ?>"
-                                   class="regular-text" placeholder="0x..." />
-                            <p class="description"><?php esc_html_e( 'Deployed TicketNFT contract address. Used as default for all events. Per-event contract can be overridden in the event settings.', 'blockchain-ticketing' ); ?></p>
-                        </td>
-                    </tr>
-                    <tr>
                         <th scope="row"><label for="bt_organizer"><?php esc_html_e( 'Default Organizer Wallet', 'blockchain-ticketing' ); ?></label></th>
                         <td>
                             <input type="text" id="bt_organizer" name="<?php echo esc_attr( BT_OPTION_KEY ); ?>[organizer_wallet]"

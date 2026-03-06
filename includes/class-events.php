@@ -1,6 +1,40 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) exit;
 
+/**
+ * Convert human-readable price to on-chain smallest unit.
+ *  - Native token (POL/ETH): 18 decimals (wei)
+ *  - ERC-20 (USDC): 6 decimals
+ */
+function bt_to_wei( string $amount, string $currency ): string {
+    if ( '' === $amount || '0' === $amount ) return '0';
+    $decimals = ( 'ERC20' === $currency ) ? 6 : 18;
+    if ( function_exists( 'bcmul' ) ) {
+        return bcmul( $amount, bcpow( '10', (string) $decimals ), 0 );
+    }
+    $parts   = explode( '.', $amount );
+    $integer = $parts[0] ?? '0';
+    $decimal = isset( $parts[1] ) ? substr( $parts[1], 0, $decimals ) : '';
+    $decimal = str_pad( $decimal, $decimals, '0', STR_PAD_RIGHT );
+    return ltrim( $integer . $decimal, '0' ) ?: '0';
+}
+
+/**
+ * Convert on-chain smallest unit back to human-readable price.
+ */
+function bt_from_wei( string $amount, string $currency ): string {
+    if ( '' === $amount || '0' === $amount ) return '';
+    $decimals = ( 'ERC20' === $currency ) ? 6 : 18;
+    if ( function_exists( 'bcdiv' ) ) {
+        $result = bcdiv( $amount, bcpow( '10', (string) $decimals ), $decimals );
+        return rtrim( rtrim( $result, '0' ), '.' );
+    }
+    $padded  = str_pad( $amount, $decimals + 1, '0', STR_PAD_LEFT );
+    $integer = ltrim( substr( $padded, 0, -$decimals ), '0' ) ?: '0';
+    $decimal = rtrim( substr( $padded, -$decimals ), '0' );
+    return $decimal ? "$integer.$decimal" : $integer;
+}
+
 class BT_Events {
 
     // ─── Register custom post type ────────────────────────────────────────────
@@ -58,6 +92,9 @@ class BT_Events {
         $organizer_wallet = get_post_meta( $post->ID, '_bt_organizer_wallet', true ) ?: ( $opts['organizer_wallet'] ?? '' );
         $contract_address = get_post_meta( $post->ID, '_bt_contract_address', true ) ?: ( $opts['contract_address'] ?? '' );
         $chain            = get_post_meta( $post->ID, '_bt_chain',             true ) ?: ( $opts['chain']             ?? 'polygon' );
+        $chain_symbols    = [ 'polygon' => 'POL', 'base' => 'ETH', 'arbitrum' => 'ETH', 'optimism' => 'ETH' ];
+        $display_price    = bt_from_wei( $price ?: '', $currency );
+        $price_unit       = 'ERC20' === $currency ? 'USDC' : ( $chain_symbols[ $chain ] ?? 'POL' );
         $allowed_chains   = [
             'polygon'  => 'Polygon (POL)',
             'base'     => 'Base (ETH)',
@@ -76,8 +113,12 @@ class BT_Events {
             <tr>
                 <th><label for="bt_price"><?php esc_html_e( 'Ticket Price', 'blockchain-ticketing' ); ?></label></th>
                 <td>
-                    <input type="text" id="bt_price" name="bt_price" value="<?php echo esc_attr( $price ); ?>" class="regular-text" placeholder="e.g. 5000000000000000000 (= 5 POL) or 10000000 (= 10 USDC)" />
-                    <p class="description"><?php esc_html_e( 'In wei for POL, or in smallest token unit for ERC-20 (USDC has 6 decimals).', 'blockchain-ticketing' ); ?></p>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <input type="number" id="bt_price" name="bt_price" value="<?php echo esc_attr( $display_price ); ?>"
+                               step="any" min="0" style="width:140px;" placeholder="0" />
+                        <strong id="bt_price_unit"><?php echo esc_html( $price_unit ); ?></strong>
+                    </div>
+                    <p class="description"><?php esc_html_e( 'Enter in full units — e.g. 5 for 5 POL, or 10 for 10 USDC.', 'blockchain-ticketing' ); ?></p>
                 </td>
             </tr>
             <tr>
@@ -93,7 +134,7 @@ class BT_Events {
                 <th><label for="bt_payment_token"><?php esc_html_e( 'ERC-20 Token Address', 'blockchain-ticketing' ); ?></label></th>
                 <td>
                     <input type="text" id="bt_payment_token" name="bt_payment_token" value="<?php echo esc_attr( $payment_token ); ?>" class="regular-text" placeholder="0x3c499c... (USDC)" />
-                    <p class="description"><?php esc_html_e( 'USDC on Polygon: 0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359', 'blockchain-ticketing' ); ?></p>
+                    <p class="description"><?php esc_html_e( 'Auto-filled with USDC when you switch to ERC-20 currency. You can change to any ERC-20 token.', 'blockchain-ticketing' ); ?></p>
                 </td>
             </tr>
             <tr>
@@ -110,13 +151,7 @@ class BT_Events {
                     <p class="description"><?php esc_html_e( 'Receives 97% of each ticket sale. Defaults to plugin settings.', 'blockchain-ticketing' ); ?></p>
                 </td>
             </tr>
-            <tr>
-                <th><label for="bt_contract_address"><?php esc_html_e( 'Contract Address', 'blockchain-ticketing' ); ?></label></th>
-                <td>
-                    <input type="text" id="bt_contract_address" name="bt_contract_address" value="<?php echo esc_attr( $contract_address ); ?>" class="regular-text" placeholder="0x..." />
-                    <p class="description"><?php esc_html_e( 'TicketNFT contract on the selected chain. Defaults to plugin settings.', 'blockchain-ticketing' ); ?></p>
-                </td>
-            </tr>
+
             <tr>
                 <th><label for="bt_chain"><?php esc_html_e( 'Chain', 'blockchain-ticketing' ); ?></label></th>
                 <td>
@@ -139,18 +174,38 @@ class BT_Events {
         </table>
 
         <script>
-        document.getElementById('bt_currency').addEventListener('change', function(){
+        var USDC_BY_CHAIN = {
+            polygon:  '0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359',
+            base:     '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+            arbitrum: '0xaf88d065e77c8cC2239327C5EDb3A432268e5831',
+            optimism: '0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85',
+        };
+        var BT_NATIVE_SYMBOL = { polygon: 'POL', base: 'ETH', arbitrum: 'ETH', optimism: 'ETH' };
+
+        function updatePriceUnit() {
+            var currency = document.getElementById('bt_currency').value;
+            var chain    = document.getElementById('bt_chain').value;
+            document.getElementById('bt_price_unit').textContent =
+                currency === 'ERC20' ? 'USDC' : (BT_NATIVE_SYMBOL[chain] || 'POL');
+        }
+
+        document.getElementById('bt_currency').addEventListener('change', function() {
             document.getElementById('bt_token_row').style.display = this.value === 'ERC20' ? '' : 'none';
+            if (this.value === 'ERC20') {
+                var chain = document.getElementById('bt_chain').value;
+                var field = document.getElementById('bt_payment_token');
+                if (!field.value && USDC_BY_CHAIN[chain]) field.value = USDC_BY_CHAIN[chain];
+            }
+            updatePriceUnit();
         });
-        // Also toggle token row when chain changes (native symbol updates in label)
+
         document.getElementById('bt_chain').addEventListener('change', function() {
-            var nativeLabels = {
-                polygon: 'POL (native)',
-                base: 'ETH (native)',
-                arbitrum: 'ETH (native)',
-                optimism: 'ETH (native)',
-            };
-            document.querySelector('#bt_currency option[value="POL"]').text = nativeLabels[this.value] || 'POL (native)';
+            var nativeLabels = { polygon: 'POL (native)', base: 'ETH (native)', arbitrum: 'ETH (native)', optimism: 'ETH (native)' };
+            document.querySelector('#bt_currency option[value="POL"]').textContent = nativeLabels[this.value] || 'POL (native)';
+            if (document.getElementById('bt_currency').value === 'ERC20' && USDC_BY_CHAIN[this.value]) {
+                document.getElementById('bt_payment_token').value = USDC_BY_CHAIN[this.value];
+            }
+            updatePriceUnit();
         });
         </script>
         <?php
@@ -189,7 +244,6 @@ class BT_Events {
         $fields = [
             '_bt_date'             => 'sanitize_text_field',
             '_bt_location'         => 'sanitize_text_field',
-            '_bt_price'            => 'sanitize_text_field',
             '_bt_currency'         => 'sanitize_text_field',
             '_bt_payment_token'    => 'sanitize_text_field',
             '_bt_total_supply'     => 'absint',
@@ -208,6 +262,13 @@ class BT_Events {
             if ( isset( $_POST[ $post_key ] ) ) {
                 update_post_meta( $post_id, $key, call_user_func( $sanitizer, wp_unslash( $_POST[ $post_key ] ) ) );
             }
+        }
+
+        // Convert human-readable price to wei before storing.
+        if ( isset( $_POST['bt_price'] ) && '' !== $_POST['bt_price'] ) {
+            $currency_for_price = sanitize_text_field( wp_unslash( $_POST['bt_currency'] ?? 'POL' ) );
+            $price_human        = sanitize_text_field( wp_unslash( $_POST['bt_price'] ) );
+            update_post_meta( $post_id, '_bt_price', bt_to_wei( $price_human, $currency_for_price ) );
         }
 
         // Convert datetime-local to ISO string for backend
