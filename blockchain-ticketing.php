@@ -3,7 +3,7 @@
  * Plugin Name:       Blockchain Ticketing for WordPress
  * Plugin URI:        https://github.com/spntnhub/Blockchain-Ticketing-for-WordPress
  * Description:       Sell and verify NFT event tickets on Polygon. Each ticket is a unique ERC-721 token minted directly to the buyer's wallet. 3% protocol fee per sale.
- * Version:           1.0.0
+ * Version:           1.0.1
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            spntn
@@ -15,7 +15,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-define( 'BT_VERSION',     '1.0.0' );
+define( 'BT_VERSION',     '1.0.1' );
 define( 'BT_PLUGIN_DIR',  plugin_dir_path( __FILE__ ) );
 define( 'BT_PLUGIN_URL',  plugin_dir_url( __FILE__ ) );
 define( 'BT_OPTION_KEY',  'bt_settings' );

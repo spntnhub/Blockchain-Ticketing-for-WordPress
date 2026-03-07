@@ -4,7 +4,7 @@ Tags:              nft, blockchain, ticketing, event tickets, polygon, web3
 Requires at least: 6.0
 Tested up to:      6.7
 Requires PHP:      7.4
-Stable tag:        1.0.0
+Stable tag:        1.0.1
 License:           GPL v2 or later
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -34,7 +34,7 @@ Sell and verify NFT event tickets on Polygon. Each ticket is a unique ERC-721 NF
 * 3% protocol fee; 97% goes to the event organizer
 * MetaMask + WalletConnect compatible
 
-= External Services =
+== External Services ==
 
 This plugin connects to the spntn backend API to:
 
@@ -87,10 +87,19 @@ Yes. Buyers need MetaMask (or equivalent) to purchase an NFT ticket.
 
 == Changelog ==
 
+= 1.0.1 =
+* Price input now accepts human-readable values (e.g. 5 for 5 POL, 10 for 10 USDC).
+* USDC token address auto-filled when ERC-20 currency is selected.
+* USDC address updates automatically when the chain is changed.
+* Removed redundant contract address fields from admin UI.
+
 = 1.0.0 =
 * Initial release.
 
 == Upgrade Notice ==
+
+= 1.0.1 =
+UX improvements: human-readable price input, automatic USDC address filling.
 
 = 1.0.0 =
 Initial release.
