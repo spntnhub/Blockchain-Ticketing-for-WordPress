@@ -20,10 +20,10 @@ define( 'SPNTN_NFT_PLUGIN_DIR',  plugin_dir_path( __FILE__ ) );
 define( 'SPNTN_NFT_PLUGIN_URL',  plugin_dir_url( __FILE__ ) );
 define( 'SPNTN_NFT_OPTION_KEY',  'spntn_nft_settings' );
 
-require_once SPNTN_NFT_PLUGIN_DIR . 'includes/class-admin.php';
-require_once SPNTN_NFT_PLUGIN_DIR . 'includes/class-events.php';
-require_once SPNTN_NFT_PLUGIN_DIR . 'includes/class-tickets.php';
-require_once SPNTN_NFT_PLUGIN_DIR . 'includes/class-checkin.php';
+require_once SPNTN_NFT_PLUGIN_DIR . 'spntn-nft-includes/class-admin.php';
+require_once SPNTN_NFT_PLUGIN_DIR . 'spntn-nft-includes/class-events.php';
+require_once SPNTN_NFT_PLUGIN_DIR . 'spntn-nft-includes/class-tickets.php';
+require_once SPNTN_NFT_PLUGIN_DIR . 'spntn-nft-includes/class-checkin.php';
 
 // ─── Bootstrap ───────────────────────────────────────────────────────────────
 
@@ -53,27 +53,27 @@ add_action( 'wp_enqueue_scripts', 'spntn_nft_enqueue_assets' );
 function spntn_nft_enqueue_assets() {
     wp_enqueue_style(
         'spntn-nft-styles',
-        SPNTN_NFT_PLUGIN_URL . 'assets/styles.css',
+        SPNTN_NFT_PLUGIN_URL . 'spntn-nft-assets/styles.css',
         [],
         SPNTN_NFT_VERSION
     );
     wp_enqueue_script(
         'spntn-nft-ethers',
-        SPNTN_NFT_PLUGIN_URL . 'assets/ethers.umd.min.js',
+        SPNTN_NFT_PLUGIN_URL . 'spntn-nft-assets/ethers.umd.min.js',
         [],
         '6.13.2',
         true
     );
     wp_enqueue_script(
         'spntn-nft-qrcodejs',
-        SPNTN_NFT_PLUGIN_URL . 'assets/qrcode.min.js',
+        SPNTN_NFT_PLUGIN_URL . 'spntn-nft-assets/qrcode.min.js',
         [],
         '1.0.0',
         true
     );
     wp_enqueue_script(
         'spntn-nft-jsqr',
-        SPNTN_NFT_PLUGIN_URL . 'assets/jsQR.js',
+        SPNTN_NFT_PLUGIN_URL . 'spntn-nft-assets/jsQR.js',
         [],
         '1.4.0',
         true
