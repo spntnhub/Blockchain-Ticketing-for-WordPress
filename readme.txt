@@ -1,6 +1,6 @@
-=== Blockchain Ticketing ===
+=== SPNTN NFT Ticketing ===
 Contributors:      spntn
-Tags:              nft, blockchain, ticketing, polygon, web3
+Tags:              nft, blockchain, ticketing, polygon, web3, spntn
 Requires at least: 6.0
 Tested up to:      6.9
 Requires PHP:      7.4
@@ -12,7 +12,7 @@ Sell and verify NFT event tickets on Polygon. Each ticket is a unique ERC-721 NF
 
 == Description ==
 
-**Blockchain Ticketing** lets event organizers sell verifiable NFT tickets directly from their WordPress site — no centralized ticketing platform required.
+**SPNTN NFT Ticketing** lets event organizers sell verifiable NFT tickets directly from their WordPress site — no centralized ticketing platform required.
 
 **How it works:**
 

@@ -6,7 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  *  - Native token (POL/ETH): 18 decimals (wei)
  *  - ERC-20 (USDC): 6 decimals
  */
-function bt_to_wei( string $amount, string $currency ): string {
+function spntn_nft_to_wei( string $amount, string $currency ): string {
     if ( '' === $amount || '0' === $amount ) return '0';
     $decimals = ( 'ERC20' === $currency ) ? 6 : 18;
     if ( function_exists( 'bcmul' ) ) {
@@ -22,7 +22,7 @@ function bt_to_wei( string $amount, string $currency ): string {
 /**
  * Convert on-chain smallest unit back to human-readable price.
  */
-function bt_from_wei( string $amount, string $currency ): string {
+function spntn_nft_from_wei( string $amount, string $currency ): string {
     if ( '' === $amount || '0' === $amount ) return '';
     $decimals = ( 'ERC20' === $currency ) ? 6 : 18;
     if ( function_exists( 'bcdiv' ) ) {
@@ -35,17 +35,17 @@ function bt_from_wei( string $amount, string $currency ): string {
     return $decimal ? "$integer.$decimal" : $integer;
 }
 
-class BT_Events {
+class SPNTN_NFT_Events {
 
     // ─── Register custom post type ────────────────────────────────────────────
 
     public static function register_post_type(): void {
-        register_post_type( 'bt_event', [
+        register_post_type( 'spntn_nft_event', [
             'labels' => [
-                'name'          => __( 'Events',     'blockchain-ticketing' ),
-                'singular_name' => __( 'Event',      'blockchain-ticketing' ),
-                'add_new_item'  => __( 'Add New Event', 'blockchain-ticketing' ),
-                'edit_item'     => __( 'Edit Event',    'blockchain-ticketing' ),
+                'name'          => __( 'Events',     'spntn-nft-ticketing' ),
+                'singular_name' => __( 'Event',      'spntn-nft-ticketing' ),
+                'add_new_item'  => __( 'Add New Event', 'spntn-nft-ticketing' ),
+                'edit_item'     => __( 'Edit Event',    'spntn-nft-ticketing' ),
             ],
             'public'             => true,
             'show_in_menu'       => true,
@@ -61,19 +61,19 @@ class BT_Events {
 
     public static function add_meta_boxes(): void {
         add_meta_box(
-            'bt_event_details',
-            __( 'Ticket Details', 'blockchain-ticketing' ),
+            'spntn_nft_event_details',
+            __( 'Ticket Details', 'spntn-nft-ticketing' ),
             [ __CLASS__, 'render_meta_box' ],
-            'bt_event',
+            'spntn_nft_event',
             'normal',
             'high'
         );
 
         add_meta_box(
-            'bt_event_sync',
-            __( 'Blockchain Sync', 'blockchain-ticketing' ),
+            'spntn_nft_event_sync',
+            __( 'Blockchain Sync', 'spntn-nft-ticketing' ),
             [ __CLASS__, 'render_sync_box' ],
-            'bt_event',
+            'spntn_nft_event',
             'side',
             'high'
         );
@@ -81,19 +81,19 @@ class BT_Events {
 
     public static function render_meta_box( WP_Post $post ): void {
         wp_nonce_field( 'bt_save_event', 'bt_event_nonce' );
-        $opts = get_option( BT_OPTION_KEY, [] );
+        $opts = get_option( SPNTN_NFT_OPTION_KEY, [] );
 
-        $date             = get_post_meta( $post->ID, '_bt_date',             true );
-        $location         = get_post_meta( $post->ID, '_bt_location',         true );
-        $total_supply     = get_post_meta( $post->ID, '_bt_total_supply',     true );
-        $price            = get_post_meta( $post->ID, '_bt_price',            true );
-        $currency         = get_post_meta( $post->ID, '_bt_currency',         true ) ?: 'POL';
-        $payment_token    = get_post_meta( $post->ID, '_bt_payment_token',    true );
-        $organizer_wallet = get_post_meta( $post->ID, '_bt_organizer_wallet', true ) ?: ( $opts['organizer_wallet'] ?? '' );
-        $contract_address = get_post_meta( $post->ID, '_bt_contract_address', true ) ?: ( $opts['contract_address'] ?? '' );
-        $chain            = get_post_meta( $post->ID, '_bt_chain',             true ) ?: ( $opts['chain']             ?? 'polygon' );
+        $date             = get_post_meta( $post->ID, '_spntn_nft_date',             true );
+        $location         = get_post_meta( $post->ID, '_spntn_nft_location',         true );
+        $total_supply     = get_post_meta( $post->ID, '_spntn_nft_total_supply',     true );
+        $price            = get_post_meta( $post->ID, '_spntn_nft_price',            true );
+        $currency         = get_post_meta( $post->ID, '_spntn_nft_currency',         true ) ?: 'POL';
+        $payment_token    = get_post_meta( $post->ID, '_spntn_nft_payment_token',    true );
+        $organizer_wallet = get_post_meta( $post->ID, '_spntn_nft_organizer_wallet', true ) ?: ( $opts['organizer_wallet'] ?? '' );
+        $contract_address = get_post_meta( $post->ID, '_spntn_nft_contract_address', true ) ?: ( $opts['contract_address'] ?? '' );
+        $chain            = get_post_meta( $post->ID, '_spntn_nft_chain',             true ) ?: ( $opts['chain']             ?? 'polygon' );
         $chain_symbols    = [ 'polygon' => 'POL', 'base' => 'ETH', 'arbitrum' => 'ETH', 'optimism' => 'ETH' ];
-        $display_price    = bt_from_wei( $price ?: '', $currency );
+        $display_price    = spntn_nft_from_wei( $price ?: '', $currency );
         $price_unit       = 'ERC20' === $currency ? 'USDC' : ( $chain_symbols[ $chain ] ?? 'POL' );
         $allowed_chains   = [
             'polygon'  => 'Polygon (POL)',
@@ -104,7 +104,7 @@ class BT_Events {
         <table class="form-table" style="margin-top:0;">
             <tr>
                 <th><label for="bt_date"><?php esc_html_e( 'Event Date & Time', 'blockchain-ticketing' ); ?></label></th>
-                <td><input type="datetime-local" id="bt_date" name="bt_date" value="<?php echo esc_attr( $date ? date( 'Y-m-d\TH:i', strtotime( $date ) ) : '' ); ?>" required /></td>
+                <td><input type="datetime-local" id="bt_date" name="bt_date" value="<?php echo esc_attr( $date ? gmdate( 'Y-m-d\TH:i', strtotime( $date ) ) : '' ); ?>" required /></td>
             </tr>
             <tr>
                 <th><label for="bt_location"><?php esc_html_e( 'Location', 'blockchain-ticketing' ); ?></label></th>
@@ -212,8 +212,8 @@ class BT_Events {
     }
 
     public static function render_sync_box( WP_Post $post ): void {
-        $backend_id = get_post_meta( $post->ID, '_bt_backend_event_id', true );
-        $slug       = get_post_meta( $post->ID, '_bt_slug',             true );
+        $backend_id = get_post_meta( $post->ID, '_spntn_nft_backend_event_id', true );
+        $slug       = get_post_meta( $post->ID, '_spntn_nft_slug',             true );
         ?>
         <?php if ( $backend_id ) : ?>
             <p>✅ <?php esc_html_e( 'Synced to backend', 'blockchain-ticketing' ); ?></p>
@@ -227,8 +227,8 @@ class BT_Events {
             <p class="description"><?php esc_html_e( 'Will sync to backend when published.', 'blockchain-ticketing' ); ?></p>
         <?php endif; ?>
         <hr>
-        <p><strong><?php esc_html_e( 'Shortcode:', 'blockchain-ticketing' ); ?></strong><br>
-            <code>[blockchain_event id="<?php echo $post->ID; ?>"]</code></p>
+        <p><strong><?php esc_html_e( 'Shortcode:', 'spntn-nft-ticketing' ); ?></strong><br>
+            <code>[spntn_nft_event id="<?php echo esc_html( $post->ID ); ?>"]</code></p>
         <?php
     }
 
@@ -242,14 +242,14 @@ class BT_Events {
         if ( $post->post_status === 'auto-draft' ) return;
 
         $fields = [
-            '_bt_date'             => 'sanitize_text_field',
-            '_bt_location'         => 'sanitize_text_field',
-            '_bt_currency'         => 'sanitize_text_field',
-            '_bt_payment_token'    => 'sanitize_text_field',
-            '_bt_total_supply'     => 'absint',
-            '_bt_organizer_wallet' => 'sanitize_text_field',
-            '_bt_contract_address' => 'sanitize_text_field',
-            '_bt_chain'            => 'sanitize_text_field',
+            '_spntn_nft_date'             => 'sanitize_text_field',
+            '_spntn_nft_location'         => 'sanitize_text_field',
+            '_spntn_nft_currency'         => 'sanitize_text_field',
+            '_spntn_nft_payment_token'    => 'sanitize_text_field',
+            '_spntn_nft_total_supply'     => 'absint',
+            '_spntn_nft_organizer_wallet' => 'sanitize_text_field',
+            '_spntn_nft_contract_address' => 'sanitize_text_field',
+            '_spntn_nft_chain'            => 'sanitize_text_field',
         ];
 
         foreach ( $fields as $key => $sanitizer ) {
@@ -260,26 +260,28 @@ class BT_Events {
             //       't' from 'total', yielding 'bt_otal_supply'.
             $post_key = ltrim( $key, '_' );
             if ( isset( $_POST[ $post_key ] ) ) {
-                update_post_meta( $post_id, $key, call_user_func( $sanitizer, wp_unslash( $_POST[ $post_key ] ) ) );
+                $value = wp_unslash( $_POST[ $post_key ] );
+                $value = call_user_func( $sanitizer, $value );
+                update_post_meta( $post_id, $key, $value );
             }
         }
 
         // Convert human-readable price to wei before storing.
-        if ( isset( $_POST['bt_price'] ) && '' !== $_POST['bt_price'] ) {
-            $currency_for_price = sanitize_text_field( wp_unslash( $_POST['bt_currency'] ?? 'POL' ) );
-            $price_human        = sanitize_text_field( wp_unslash( $_POST['bt_price'] ) );
-            update_post_meta( $post_id, '_bt_price', bt_to_wei( $price_human, $currency_for_price ) );
+        if ( isset( $_POST['spntn_nft_price'] ) && '' !== $_POST['spntn_nft_price'] ) {
+            $currency_for_price = sanitize_text_field( wp_unslash( $_POST['spntn_nft_currency'] ?? 'POL' ) );
+            $price_human        = sanitize_text_field( wp_unslash( $_POST['spntn_nft_price'] ) );
+            update_post_meta( $post_id, '_spntn_nft_price', spntn_nft_to_wei( $price_human, $currency_for_price ) );
         }
 
         // Convert datetime-local to ISO string for backend
-        if ( ! empty( $_POST['bt_date'] ) ) {
-            $dt = sanitize_text_field( wp_unslash( $_POST['bt_date'] ) );
-            update_post_meta( $post_id, '_bt_date', $dt );
+        if ( ! empty( $_POST['spntn_nft_date'] ) ) {
+            $dt = sanitize_text_field( wp_unslash( $_POST['spntn_nft_date'] ) );
+            update_post_meta( $post_id, '_spntn_nft_date', $dt );
         }
 
         // Sync to backend (only if published)
         if ( $post->post_status === 'publish' ) {
-            BT_Admin::sync_event_to_backend( $post_id );
+            SPNTN_NFT_Admin::sync_event_to_backend( $post_id );
         }
     }
 }

@@ -1,22 +1,22 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-class BT_Admin {
+class SPNTN_NFTT_Admin {
 
     public static function register_menu(): void {
         add_options_page(
-            __( 'Blockchain Ticketing', 'blockchain-ticketing' ),
-            __( 'Blockchain Ticketing', 'blockchain-ticketing' ),
+            __( 'SPNTN NFT Ticketing', 'spntn-nft-ticketing' ),
+            __( 'SPNTN NFT Ticketing', 'spntn-nft-ticketing' ),
             'manage_options',
-            'blockchain-ticketing',
+            'spntn-nft-ticketing',
             [ __CLASS__, 'settings_page' ]
         );
     }
 
     public static function register_settings(): void {
         register_setting(
-            'bt_settings_group',
-            BT_OPTION_KEY,
+            'spntn_nftt_settings_group',
+            SPNTN_NFTT_OPTION_KEY,
             [ 'sanitize_callback' => [ __CLASS__, 'sanitize' ] ]
         );
     }
@@ -24,41 +24,41 @@ class BT_Admin {
     public static function sanitize( array $input ): array {
         $allowed_chains = [ 'polygon', 'base', 'arbitrum', 'optimism' ];
         $chain = in_array( $input['chain'] ?? '', $allowed_chains, true ) ? $input['chain'] : 'polygon';
-        return [
-            'api_key'            => sanitize_text_field( $input['api_key']    ?? '' ),
-            'backend_url'        => esc_url_raw( rtrim( $input['backend_url'] ?? '', '/' ) ),
-            'contract_address'   => sanitize_text_field( $input['contract_address'] ?? '' ),
-            'organizer_wallet'   => sanitize_text_field( $input['organizer_wallet']  ?? '' ),
+            register_setting(
+                'spntn_nft_settings_group',
+                SPNTN_NFT_OPTION_KEY,
+                [ 'sanitize_callback' => [ __CLASS__, 'sanitize' ] ]
+            );
             'chain'              => $chain,
         ];
     }
-
+            $opts = get_option( SPNTN_NFT_OPTION_KEY, [] );
     public static function settings_page(): void {
-        $opts = get_option( BT_OPTION_KEY, [] );
+        $opts = get_option( SPNTN_NFTT_OPTION_KEY, [] );
         ?>
         <div class="wrap">
-            <h1><?php esc_html_e( 'Blockchain Ticketing Settings', 'blockchain-ticketing' ); ?></h1>
+                    <?php settings_fields( 'spntn_nft_settings_group' ); ?>
 
             <!-- Get API Key modal -->
             <div id="bt-api-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,.5); z-index:9999;">
                 <div style="background:#fff; max-width:460px; margin:80px auto; padding:28px; border-radius:8px;">
-                    <h2><?php esc_html_e( 'Get Your API Key', 'blockchain-ticketing' ); ?></h2>
-                    <p><?php esc_html_e( 'Enter your email to receive a free API key.', 'blockchain-ticketing' ); ?></p>
+                                <input type="text" id="bt_api_key" name="<?php echo esc_attr( SPNTN_NFT_OPTION_KEY ); ?>[api_key]"
+                    <p><?php esc_html_e( 'Enter your email to receive a free API key.', 'spntn-nft-ticketing' ); ?></p>
                     <input type="email" id="bt-modal-email" placeholder="your@email.com" style="width:100%; margin-bottom:8px;" class="regular-text" />
                     <br>
-                    <button id="bt-modal-submit" class="button button-primary"><?php esc_html_e( 'Send', 'blockchain-ticketing' ); ?></button>
-                    <button id="bt-modal-close" class="button" style="margin-left:8px;"><?php esc_html_e( 'Cancel', 'blockchain-ticketing' ); ?></button>
+                    <button id="bt-modal-submit" class="button button-primary"><?php esc_html_e( 'Send', 'spntn-nft-ticketing' ); ?></button>
+                    <button id="bt-modal-close" class="button" style="margin-left:8px;"><?php esc_html_e( 'Cancel', 'spntn-nft-ticketing' ); ?></button>
                     <div id="bt-modal-result" style="margin-top:12px;"></div>
                 </div>
-            </div>
+                                <select id="bt_chain" name="<?php echo esc_attr( SPNTN_NFT_OPTION_KEY ); ?>[chain]">
 
             <form method="post" action="options.php">
-                <?php settings_fields( 'bt_settings_group' ); ?>
+                <?php settings_fields( 'spntn_nftt_settings_group' ); ?>
                 <table class="form-table">
                     <tr>
-                        <th scope="row"><label for="bt_api_key"><?php esc_html_e( 'API Key', 'blockchain-ticketing' ); ?></label></th>
+                        <th scope="row"><label for="bt_api_key"><?php esc_html_e( 'API Key', 'spntn-nft-ticketing' ); ?></label></th>
                         <td>
-                            <input type="text" id="bt_api_key" name="<?php echo esc_attr( BT_OPTION_KEY ); ?>[api_key]"
+                            <input type="text" id="bt_api_key" name="<?php echo esc_attr( BLOCTI_OPTION_KEY ); ?>[api_key]"
                                    value="<?php echo esc_attr( $opts['api_key'] ?? '' ); ?>"
                                    class="regular-text" autocomplete="off" />
                             <button type="button" id="bt-get-key-btn" class="button" style="margin-left:8px;">
@@ -70,7 +70,7 @@ class BT_Admin {
                     <tr>
                         <th scope="row"><label for="bt_chain"><?php esc_html_e( 'Default Chain', 'blockchain-ticketing' ); ?></label></th>
                         <td>
-                            <select id="bt_chain" name="<?php echo esc_attr( BT_OPTION_KEY ); ?>[chain]">
+                            <select id="bt_chain" name="<?php echo esc_attr( BLOCTI_OPTION_KEY ); ?>[chain]">
                                 <?php
                                 $cur_chain = $opts['chain'] ?? 'polygon';
                                 $chains = [
@@ -92,7 +92,7 @@ class BT_Admin {
                     <tr>
                         <th scope="row"><label for="bt_backend_url"><?php esc_html_e( 'Backend URL', 'blockchain-ticketing' ); ?></label></th>
                         <td>
-                            <input type="url" id="bt_backend_url" name="<?php echo esc_attr( BT_OPTION_KEY ); ?>[backend_url]"
+                            <input type="url" id="bt_backend_url" name="<?php echo esc_attr( BLOCTI_OPTION_KEY ); ?>[backend_url]"
                                    value="<?php echo esc_attr( $opts['backend_url'] ?? 'https://nft-saas-production.up.railway.app' ); ?>"
                                    class="regular-text" />
                         </td>
@@ -100,7 +100,7 @@ class BT_Admin {
                     <tr>
                         <th scope="row"><label for="bt_organizer"><?php esc_html_e( 'Default Organizer Wallet', 'blockchain-ticketing' ); ?></label></th>
                         <td>
-                            <input type="text" id="bt_organizer" name="<?php echo esc_attr( BT_OPTION_KEY ); ?>[organizer_wallet]"
+                            <input type="text" id="bt_organizer" name="<?php echo esc_attr( BLOCTI_OPTION_KEY ); ?>[organizer_wallet]"
                                    value="<?php echo esc_attr( $opts['organizer_wallet'] ?? '' ); ?>"
                                    class="regular-text" placeholder="0x..." />
                             <p class="description"><?php esc_html_e( 'Wallet that receives 97% of each ticket sale. Can be overridden per event.', 'blockchain-ticketing' ); ?></p>
