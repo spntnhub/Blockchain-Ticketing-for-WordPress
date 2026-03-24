@@ -1,0 +1,242 @@
+/* Blockchain Ticketing for WordPress — styles.css */
+
+/* ── Ticket Widget ─────────────────────────────────────────────────────────── */
+
+.bt-ticket-widget {
+  max-width: 540px;
+  margin: 24px auto;
+  padding: 28px 32px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,.06);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.bt-event-header {
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.bt-event-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 6px;
+  color: #1a202c;
+}
+
+.bt-event-meta {
+  color: #4a5568;
+  margin: 4px 0;
+  font-size: .95rem;
+}
+
+.bt-ticket-info {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 22px;
+  flex-wrap: wrap;
+}
+
+.bt-price-label,
+.bt-supply-label {
+  font-size: .95rem;
+  color: #4a5568;
+}
+
+.bt-price-label strong {
+  color: #1a202c;
+  font-size: 1.1rem;
+}
+
+/* ── Buttons ───────────────────────────────────────────────────────────────── */
+
+.bt-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.bt-btn {
+  padding: 11px 22px;
+  border: none;
+  border-radius: 8px;
+  font-size: .95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .15s, opacity .15s;
+  line-height: 1;
+}
+
+.bt-btn:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+.bt-btn-primary {
+  background: #7c3aed;
+  color: #fff;
+}
+
+.bt-btn-primary:not(:disabled):hover { background: #6d28d9; }
+
+.bt-btn-secondary {
+  background: #f7f7f7;
+  color: #1a202c;
+  border: 1px solid #d1d5db;
+}
+
+.bt-btn-secondary:not(:disabled):hover { background: #e9e9e9; }
+
+/* ── Status messages ───────────────────────────────────────────────────────── */
+
+.bt-status {
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-size: .9rem;
+  background: #f0f9ff;
+  color: #0369a1;
+  margin-top: 10px;
+}
+
+.bt-status.bt-error {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.bt-status.bt-success {
+  background: #f0fdf4;
+  color: #15803d;
+}
+
+.bt-error {
+  color: #b91c1c;
+}
+
+/* ── Ticket result (QR) ────────────────────────────────────────────────────── */
+
+.bt-ticket-result {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid #f0f0f0;
+  text-align: center;
+}
+
+.bt-ticket-result h3 {
+  font-size: 1.2rem;
+  margin-bottom: 8px;
+  color: #1a202c;
+}
+
+.bt-success-msg {
+  color: #4a5568;
+  font-size: .9rem;
+  margin-bottom: 16px;
+}
+
+.bt-qr-container {
+  display: inline-block;
+  padding: 12px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+}
+
+.bt-qr-container img,
+.bt-qr-container canvas {
+  display: block;
+}
+
+/* ── Check-in Widget ───────────────────────────────────────────────────────── */
+
+.bt-checkin-widget {
+  max-width: 480px;
+  margin: 24px auto;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.bt-checkin-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin-bottom: 16px;
+}
+
+.bt-camera-wrap {
+  position: relative;
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #000;
+  margin-bottom: 14px;
+}
+
+.bt-camera-wrap video {
+  width: 100%;
+  display: block;
+  max-height: 340px;
+  object-fit: cover;
+}
+
+.bt-scan-status {
+  color: #4a5568;
+  font-size: .95rem;
+  margin-bottom: 14px;
+  text-align: center;
+}
+
+/* ── Scan results ──────────────────────────────────────────────────────────── */
+
+.bt-scan-result {
+  padding: 20px 22px;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.bt-result-valid {
+  background: #f0fdf4;
+  border: 2px solid #22c55e;
+}
+
+.bt-result-invalid {
+  background: #fef2f2;
+  border: 2px solid #ef4444;
+}
+
+.bt-result-used {
+  background: #fffbeb;
+  border: 2px solid #f59e0b;
+}
+
+.bt-result-icon {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.bt-result-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.bt-result-valid   .bt-result-title { color: #15803d; }
+.bt-result-invalid .bt-result-title { color: #b91c1c; }
+.bt-result-used    .bt-result-title { color: #d97706; }
+
+.bt-ticket-details {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 0;
+  text-align: left;
+  font-size: .9rem;
+  color: #374151;
+}
+
+.bt-ticket-details li {
+  padding: 3px 0;
+}
